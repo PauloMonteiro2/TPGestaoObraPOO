@@ -1,39 +1,85 @@
 ﻿namespace TPGestaoObraPOO.Models
 {
-    partial class ConstructionProject
+    public abstract class ConstructionJob
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
+        #region Propriedades Privadas
+
+        private double budget;
+        private DateOnly endDate;
+        private string status;
+
+        #endregion
+
+        public string Name { get; set; }
+
+        public string Address { get; set; }
+
+        public string Description { get; set; }
+
+        #region Propriedades Públicas
+
+        /// Obtém o ID da obra. O ID é definido apenas uma vez.
+
+        public int JobId { get; private set; }
+
+        public DateOnly StartDate { get; set; }
+
+        #endregion
+
+        #region Construtor
+        public ConstructionJob(int jobId, string jobName, string description, double initialBudget)
         {
-            if (disposing && (components != null))
+            JobId = jobId;
+            Name = jobName;
+            budget = initialBudget;
+        }
+
+        public string Status
+        {
+            get { return status; }
+            set
             {
-                components.Dispose();
+                if (value == "Em curso" || value == "Concluído" || value == "Em Planeamento")
+                {
+                    status = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Estado inválido!");
+                }
             }
-            base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
+        public DateOnly EndDate
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "ConstructionProject";
+            get { return endDate; }
+            set
+            {
+                if (StartDate == default)
+                {
+                    throw new InvalidOperationException("A data de início deve ser definida antes da data de término.");
+                }
+                if (value >= StartDate)
+                {
+                    endDate = value;
+                }
+                else
+                {
+                    throw new ArgumentException("A data de término deve ser posterior à data de início da obra!");
+                }
+            }
         }
 
+        public double Budget
+        {
+            get { return budget; }
+            private set { budget = value; }
+        }
+        #endregion
+
+        #region CalcularTaxaObra
+        public abstract double Calculate(); // Calcula a taxa de uma obra pública
         #endregion
     }
 }
